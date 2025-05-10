@@ -10,6 +10,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from loguru import logger
 from pydantic import BaseModel
 from tqdm import tqdm
+from tqdm.asyncio import tqdm as async_tqdm
 
 from utils.proof_utils import split_proof_header
 from utils.repl_cache import LRUReplCache
@@ -82,7 +83,7 @@ async def lifespan(app: FastAPI):
     relp_cache_tasks = [
         asyncio.create_task(_repl_cleaner()),
         asyncio.create_task(_repl_creater()),
-        asyncio.create_task(_stat_printer()),
+        # asyncio.create_task(_stat_printer()),
     ]
 
     # Prefill repl_cache, The pre-filled amount should not be greater than settings.MAX_REPLS.
@@ -189,7 +190,8 @@ async def verify(
     ]
 
     # Await the results of all the tasks concurrently
-    results_data = await asyncio.gather(*tasks)
+    # results_data = await asyncio.gather(*tasks)
+    results_data = await async_tqdm.gather(*tasks)
 
     results = []
     for result in results_data:
